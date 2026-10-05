@@ -28,8 +28,8 @@ type transit struct {
 	keyID string
 }
 
-// Only keyID, the key's fingerprint, not any name: a seal configured for
-// another key must fail, not have its root key encrypted to this one.
+// Only keyID, not any name: a node configured for another seal must fail
+// here, with the name to use, not later and less clearly.
 func transitHandler(kms cipher, keyID string) http.Handler {
 	t := transit{kms: kms, keyID: keyID}
 	mux := http.NewServeMux()
@@ -86,7 +86,7 @@ func (t transit) decrypt(w http.ResponseWriter, r *http.Request) {
 
 func (t transit) accept(w http.ResponseWriter, r *http.Request, body any) bool {
 	if key := r.PathValue("key"); key != t.keyID {
-		fail(w, http.StatusForbidden, fmt.Errorf("key %q is not served here", key))
+		fail(w, http.StatusForbidden, fmt.Errorf("key %q is not served here; key_name must be %q", key, t.keyID))
 		return false
 	}
 	if err := json.NewDecoder(r.Body).Decode(body); err != nil {

@@ -14,6 +14,12 @@ import (
 	"time"
 )
 
+// Fixed, not configured or derived from the key: there is one key, and a
+// node configured for any other seal must be told so at its first request.
+// The name also says, wherever key_name is read, that this is the
+// development seal.
+const keyName = "dev"
+
 func main() {
 	if err := run(); err != nil {
 		fmt.Fprintf(os.Stderr, "vault-seal-dev: %v\n", err)
@@ -51,8 +57,8 @@ func run() error {
 	// Loud, not a line among the others: like Vault's dev mode, this must
 	// never be mistaken for a seal fit for production.
 	slog.Warn("DEVELOPMENT ONLY: the seal key is a file on this host, so anyone who can read it can unseal Vault. Do not use in production.", "key", keyPath)
-	slog.Info("serving", "socket", *socket, "key_name", k.fingerprint)
-	return serve(l, transitHandler(k, k.fingerprint))
+	slog.Info("serving", "socket", *socket, "key_name", keyName, "fingerprint", k.fingerprint)
+	return serve(l, transitHandler(k, keyName))
 }
 
 // A Unix socket, not TCP on loopback: on loopback any local process could

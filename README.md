@@ -37,12 +37,12 @@ Run it as a user in the `vault` group, so that the Vault server can use the sock
 seal "transit" {
   address         = "unix:///run/vault-seal/kms.sock"
   mount_path      = "transit/"
-  key_name        = "<fingerprint>"
+  key_name        = "dev"
   disable_renewal = "true"
 }
 ```
 
-`key_name` is the key's fingerprint, in lower case, as vault-seal-dev logs it at start. Requests for any other key are refused.
+`key_name` is always `dev`: a request for any other name is refused, with the name to use. vault-seal-dev logs the fingerprint of the key it loaded at start.
 
 After its `vault:v1:` prefix, a ciphertext is a base64 OpenPGP message to that key: `gpg -d` decrypts it too.
 

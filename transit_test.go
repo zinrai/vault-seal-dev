@@ -38,7 +38,7 @@ func TestVaultsTransitSealRoundTripsThroughTheSocket(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	srv := &http.Server{Handler: transitHandler(k, k.fingerprint)}
+	srv := &http.Server{Handler: transitHandler(k, keyName)}
 	go srv.Serve(l)
 	t.Cleanup(func() { srv.Close() })
 
@@ -46,7 +46,7 @@ func TestVaultsTransitSealRoundTripsThroughTheSocket(t *testing.T) {
 	if _, err := seal.SetConfig(t.Context(), wrapping.WithConfigMap(map[string]string{
 		"address":         "unix://" + socket,
 		"mount_path":      "transit/",
-		"key_name":        k.fingerprint,
+		"key_name":        keyName,
 		"disable_renewal": "true",
 	})); err != nil {
 		t.Fatal(err)
